@@ -5,11 +5,9 @@ library(readxl)
 library(ggfortify)
 library(cluster)
 
-#Upload your data I will call them DataPCA
-
-#
-
-ReducedData
+#Upload your data I will call it DataPCA
+DataPCA <- Data[1:11]
+#Transform data to the correct format 
 pca_res <- prcomp(DataPCA, scale. = TRUE)
 pca_res
 
@@ -17,12 +15,14 @@ pca_res
 #Basic autoplot
 autoplot(pca_res)
 
-##Autoplot customisation (pca_res, data, frame, frame type, size ???, frame level, scale, colour, 
+##Autoplot customization
+#Autoplot general customisation (pca_res, data, cluster: T/F, cluster type, size, 
 autoplot(pca_res, data = DataPCA, frame = TRUE, frame.type = 'norm', size = 2.8,
+#frame level: % of probability of samples being inside the cluster, scale, 
          frame.level = c(0.6),scale = 0, 
-#colour by group, loadings (when true draws eigenvectors), loadings colour
+#colour by group (in my case "Stage"), loadings (when TRUE draws eigenvectors), loadings colour
          colour = 'Stage', loadings = TRUE, loadings.colour = "#848884", 
-#loadings label: T/F, size, colour
+#loadings label: T/F, size, colour,
          loadings.label = TRUE, loadings.label.size = 4, loadings.label.colour = "#2C2C2C",
 #In case you want to manually adjust the loadings label vertical position, change the values as required. In either case omit this line 
          loadings.label.vjust = c(-0.90, 1.6, 1.65, 1.65, 1.65, 1.65, -2.35, 0.55, 0.2, 1.2, -0.8),
@@ -30,7 +30,7 @@ autoplot(pca_res, data = DataPCA, frame = TRUE, frame.type = 'norm', size = 2.8,
          loadings.label.hjust = c(0.15, 0.2, 0.8, 0.5, 0.8, 0.7, 0.55, 1.1, 1.1, 1.05, 0.8),
 #Loadings label repel eachother
          loadings.label.repel=F,
-#Customization of loadings (size, type)
+#Customization of loadings (size, type))
          loadings.arrow = grid::arrow(length=unit(0.15,"cm"), type = "closed")) +
 #Set group colors, in case for more than two groups just add them 
   scale_color_manual(values = c("#d6a6a8","#aac6ca")) +
@@ -38,13 +38,17 @@ autoplot(pca_res, data = DataPCA, frame = TRUE, frame.type = 'norm', size = 2.8,
   theme(axis.title=element_text(size=16, color = "#454545", hjust = 0.5))+
 #Theme classic because I liked the axis and the font
   theme_classic()+
-#Customization of the y axis (breaks: start, end, distance between ticks, limits: start and end, expand: to give final tick to the axis)
+#Customization of the y axis (breaks: start, end, distance between ticks, 
   scale_y_continuous(breaks = seq(-6, 4, 2),
-                     limits=c(-6,4), 
+#limits: start and end, 
+                     limits=c(-6,4),
+#expand: to give final tick to the axis)
                      expand = c(0,0))+
-#Customization of the x axis (breaks: start, end, distance between ticks, limits: start and end, expand: to give final tick to the axis)
+#Customization of the x axis (breaks: start, end, distance between ticks, 
   scale_x_continuous(breaks = seq(-6, 4, 2),
+#limits: start and end, 
                      limits=c(-6,4), 
+#expand: to give final tick to the axis)
                      expand = c(0,0))+
 #Customization of the title (horizontal position, vertical position, size, bold, color)
   theme(plot.title = element_text(hjust = 0.5, vjust = 1, size = 20, face="bold", color = "#2C2C2C")) +
@@ -52,15 +56,15 @@ autoplot(pca_res, data = DataPCA, frame = TRUE, frame.type = 'norm', size = 2.8,
   labs(title = "My PCA") +
 #Legend position
   theme(legend.position = c(0.92,0.08)) +
-#
+#To manually modify the order of the groups in the legend (dots)
   scale_color_discrete(breaks=c("Juvenile","Adult")) +
-#
+#To manually modify the order of the groups in the legend (cluster)
   scale_fill_discrete(guide = guide_legend(reverse=TRUE))+
-#Legend customization (Title, panel background, legend background: Color, transparency, linetype, border color, size text)
+#Legend customization (Title, panel background, 
   theme(legend.title = element_blank(), panel.background = element_rect(fill='transparent'),
-        legend.background = element_rect(fill= alpha("#EBEBEBFF",0.3),
-                                         linetype="solid", 
-                                         colour = "#C1C1C1FF"),
+#legend background: Color, transparency, linetype, border color, 
+        legend.background = element_rect(fill= alpha("#EBEBEBFF",0.3), linetype="solid", colour = "#C1C1C1FF"),
+#legend size text)
         legend.text=element_text(size = 11)) +
 #To add an horizontal line where y = 0 (y intercept, color, linetype)
   geom_hline(yintercept=0, color="#A9A9A9", linetype="dashed")+
