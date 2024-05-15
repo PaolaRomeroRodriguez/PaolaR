@@ -1,0 +1,79 @@
+#Libraries 
+library(ggplot2)
+library(dplyr)
+library(readxl)
+library(ggpubr)
+
+#Load data 
+DataForPlot
+
+##Plot
+#Name Plot and select data
+Plot1<- DataForPlot %>% 
+#Select the parameters of your interest 
+  select(STAGE, MParameter) %>% 
+#Select the parameter to group by (in my case stage)
+  group_by(STAGE) %>%  
+#Caleculate the mean of your measured parameter
+  summarise(meanMParameter= mean(MParameter)) %>% 
+#geom_col (columns chart): establish x axis, y axis, and set groups 
+  ggplot() + geom_col(aes(x = STAGE, y= meanMParameter, group=STAGE),
+#Customization of the graph (Color of the columns, color of the border of the columns, transparency, size of the border, width of the columns, remove NA: T/F)
+                      fill = c("#f89c96", "#7ad2d5" ), color = c("#2C2C2C","#2C2C2C" ), alpha = 0.65, size= 0.6, width = 0.4, na.rm = T) +
+#Set limits of the y axis (Optional)
+  ylim(0,0.15) +
+#Set titles of axis and title of the graph
+  labs(x= NULL, y = "Parameter of interest", title = "My Plot") +
+#Manually set the order of the columns 
+  scale_x_discrete(limits = c("Stage1", "Stage2")) + 
+#Customization of y axis (start, end, distance between ticks)
+  scale_y_continuous(breaks = seq(0, 0.15, 0.05), 
+#Set limits of the y axis (Optional) must agree with line 24
+                     limits = c(0,0.15), 
+#To make the y axis finish with a tick
+                     expand = c(0,0)) +
+#Because I like the font and axis
+  theme_classic()+
+#Axis title customization (size, colour, horizontal position, face)
+  theme(axis.title=element_text(size=11, color = "#2C2C2C", hjust = 0.5, face="bold"))+
+#Title customization (horizontal position, size, vertical position, face, and color) 
+  theme(plot.title = element_text(hjust = 0.5, size = 13, vjust = 1, face="bold", color = "#2C2C2C")) +
+#Change the background to white
+  theme(panel.background = element_blank(), 
+#Delete legend legend
+legend.position = "none") +
+#Geom_point (points chart): Establish data
+  geom_point(data = DataForPlot %>% 
+#Ungroup
+               ungroup() %>% 
+#Select the parameters of your interest (must agree with line 14)  
+               select(STAGE, MParameter) %>% 
+#Select the parameter to group by (same that in line 16)
+               group_by(STAGE),
+#Customization of points (shape, transparency, size, remove NA: T/F)
+             shape = 21, alpha = 0.8, size =2, na.rm = T,
+#Set x axis, y axis, and define the fill and colour based on the group
+             aes(x = STAGE, y= MParameter, fill = STAGE, color = STAGE)) +
+#Manual selection of the border color of the points
+  scale_color_manual(values=c("black","black"))+
+#Manual selection of the color of the points
+  scale_fill_manual(values = c("#f6726a", "#00c0c5")) +
+#Select dataset for the error bars
+  geom_errorbar(data = DataForPlot %>%
+#Ungroup
+                  ungroup() %>% 
+#Select the parameters of your interest 
+                  select(STAGE, MParameter) %>%
+#Select the parameter to group by (same that in line 16)
+                  group_by(STAGE) %>% 
+#Calculate the mean of your measured parameter (must agree with line 14)  
+                  summarise(meanMParameter= mean(MParameter),
+#Calculate the SEM of your measured parameter
+                            sdmeanMParameter= sd(MParameter)/sqrt(length(MParameter))),
+#Establish the error bars
+                aes(x = STAGE, ymin=meanMParameter, ymax=meanMParameter + sdmeanMParameter), 
+#Customization of the error bars (colour, transparency, size, and width)
+                colour="#2C2C2C", alpha=1, size=0.6, width=0.1)
+
+#View result
+Plot1
